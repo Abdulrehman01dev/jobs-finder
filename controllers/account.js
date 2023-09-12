@@ -11,7 +11,7 @@ const register = async (req, res) => {
 
   res.status(StatusCodes.CREATED).json({
     success: true,
-    response: { user: result.name, id: result._id, token: token },
+    user: { name: result.name, id: result._id, token: token },
   });
 };
 
