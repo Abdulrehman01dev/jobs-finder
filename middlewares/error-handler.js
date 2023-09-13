@@ -1,7 +1,7 @@
 const statuscodes  = require('http-status-codes');
 const customApiError  = require('../errors/customApiError');
 
-const errorHandler = async (err, req, res, next) =>{
+const errorHandler = async (err, req, res, next) =>{ 
 
     let customError = {
         statusCode: err.statusCode || statuscodes.INTERNAL_SERVER_ERROR,
@@ -25,6 +25,11 @@ const errorHandler = async (err, req, res, next) =>{
     if(err.name==='CastError'){
         customError.msg =  `Enter valid ID, No such item found with this id ${err.value}`;
         customError.statusCode = 404;
+    }
+
+    if(err.statusCode===401 || err.code === 401){
+        customError.msg =  `Invalid Credential`;
+        customError.statusCode = 401;
     }
 
 
