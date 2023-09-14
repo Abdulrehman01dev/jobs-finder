@@ -14,8 +14,11 @@ const createJob = async(req, res) =>{
 
 
 const getAllJobs = async(req, res) =>{
+    console.log(req.query);
+    const limit = req.query.limit || 10;
+    const offset = req.query.offset || 0;
     
-    const result = await job.find().sort('createdAt')
+    const result = await job.find().sort('createdAt').skip(offset).limit(limit)
     res.status(StatusCodes.OK).json({result});
 }
 
