@@ -13,10 +13,26 @@ const jobsSchema = new mongoose.Schema({
         required: [true, 'Please provide position!'],
         maxlength: 100
     },
-    status: {
+    location: {
         type: String,
-        enum: ['interview', 'pending', 'declined'],
-        default: 'pending'
+        required: [true, 'Please provide location!'],
+        maxlength: 100
+    },
+    priceRange: {
+        type: [Number],
+        required: [true, 'Please provide priceRange!'],
+    },
+    skills: {
+        type: [String],
+        required: [true, 'Please provide skills!'],
+    },
+    jobType: {
+        type: String,
+        required: [true, 'Please provide jobType!'],
+    },
+    responsibilities: {
+        type: [String],
+        required: [true, 'Please provide responsibilities!'],
     },
     createdBy: {
         type: mongoose.Types.ObjectId,
