@@ -11,7 +11,7 @@ const register = async (req, res) => {
 
   res.status(StatusCodes.CREATED).json({
     success: true,
-    user: { name: result.name, id: result._id, token: token },
+    user: { id: result._id, name: result.name, token: token, expiresIn: expirationTime() },
   });
 };
 
@@ -33,22 +33,23 @@ const login = async (req, res) => {
     throw new UnauthenticatedError("Invalid Credentials");
   }
 
-  // let authHeaders = req.headers.authorization;
-
-  // if(!authHeaders || !authHeaders.startsWith('Bearer ')){
-  //     throw new UnauthenticatedError('Please provide the token!')
-  // }
-  // let token = authHeaders.split(' ')[1]
-  // let auth = jwt.verify(token, process.env.JWT_SECRET_KEY )
-
   let token = result.Create_JWT();
 
   res.status(StatusCodes.OK)
       .json({
         success: true,
-        user: { id: result._id, name: result.name, token: token },
+        user: { id: result._id, name: result.name, token: token, expiresIn: expirationTime() },
     });
 };
+
+
+const expirationTime = () =>{
+  const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+  const expirationTime = new Date().getTime() + oneDayInMilliseconds;
+  return expirationTime;
+}
+
+
 
 module.exports = {
   register,
