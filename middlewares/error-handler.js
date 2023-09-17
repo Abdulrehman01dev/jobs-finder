@@ -2,6 +2,7 @@ const statuscodes  = require('http-status-codes');
 const { customApiError } = require('../errors');
 
 const errorHandler = async (err, req, res, next) =>{ 
+    console.log(err);
     if(err instanceof customApiError){
         return res.status(err.statusCode).json({ msg: err.message })
     }

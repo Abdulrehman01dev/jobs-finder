@@ -1,7 +1,10 @@
 
 const { StatusCodes } = require('http-status-codes');
 const job = require('../models/jobs'); 
-const { NotFoundError } = require('../errors'); 
+const { NotFoundError, UnauthenticatedError } = require('../errors'); 
+const multer = require('multer');
+const user = require('../models/user');
+const fs = require('fs');
 
 const createJob = async(req, res) =>{
     req.body.createdBy = req.user.userID;
@@ -14,7 +17,6 @@ const createJob = async(req, res) =>{
 
 
 const getAllJobs = async(req, res) =>{
-    console.log(req.query);
     const limit = req.query.limit || 10;
     const offset = req.query.offset || 0;
     
@@ -75,6 +77,52 @@ const updateJob = async(req, res) =>{
 }
 
 
+
+const updateProfile = async (req, res) =>{
+    const userInfo = await user.findById(req.user.userID);
+    /// Check if user exists or not!
+    
+    if(userInfo){
+        const data = req.body;
+        const cleanData = {};
+        const allowedKeys = ['name', 'email', 'password', 'profile_photo', 'address', 'company'];
+
+
+        if(req.file){
+            allowedKeys.profile_photo = '/assets/uploads/' + req.file.filename;
+        }
+        if(userInfo.profile_photo){
+            const filePath = `${userInfo.profile_photo}`;
+            fs.unlinkSync(filePath);
+        }
+    
+        allowedKeys.map(ele =>{
+        if(data[ele]){
+            cleanData[ele] = data[ele]
+        }})
+    
+        let result = await user.findByIdAndUpdate({_id : req.user.userID}, {...allowedKeys}, {runValidators: true, new: true})
+        console.log(result);
+    
+        return res.status(StatusCodes.OK).json({result});
+    }
+    throw new UnauthenticatedError('Invalid User!')
+  }
+  
+  
+  const upload = multer({
+    storage: multer.diskStorage({
+      destination: function(req, file, cb){
+        cb(null, 'assets/uploads')
+      },
+      filename: function(req ,file, cb){
+        cb(null, file.fieldname+Date.now()+'.jpg')
+      }
+    })
+  }).single('profile_photo')
+
+
+
 module.exports = {
     createJob,
     deleteJob,
@@ -82,4 +130,6 @@ module.exports = {
     getMyJobs,
     updateJob,
     getJob,
+    updateProfile,
+    upload,
   }

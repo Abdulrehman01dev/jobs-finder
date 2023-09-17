@@ -43,6 +43,7 @@ const login = async (req, res) => {
 };
 
 
+
 const expirationTime = () =>{
   const oneDayInMilliseconds = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
   const expirationTime = new Date().getTime() + oneDayInMilliseconds;
@@ -53,5 +54,5 @@ const expirationTime = () =>{
 
 module.exports = {
   register,
-  login,
+  login
 };

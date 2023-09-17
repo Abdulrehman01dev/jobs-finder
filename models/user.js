@@ -26,6 +26,20 @@ const userSchema = mongoose.Schema({
     required: [true, "Must provide password"],
     minlength: 6,
   },
+
+  profile_photo: {
+    type: String,
+    default: null,
+    minlength: 12
+  },
+  address: {
+    type: String,
+    default: null
+  },
+  company: {
+    type: String,
+    default: null
+  },
 });
 
 
