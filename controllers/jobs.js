@@ -77,6 +77,17 @@ const updateJob = async(req, res) =>{
 }
 
 
+const getProfile = async(req, res) =>{
+    console.log(req.user.userID);
+    const result = await user.findOne({ _id: req.user.userID});
+
+    if (!result) {
+      throw new NotFoundError(`Can't find User with id: ${jobID}`);
+    }
+    res.status(StatusCodes.OK).json({success : true, response: result})
+}
+
+
 
 const updateProfile = async (req, res) =>{
     const userInfo = await user.findById(req.user.userID);
@@ -131,6 +142,7 @@ module.exports = {
     getMyJobs,
     updateJob,
     getJob,
+    getProfile,
     updateProfile,
     upload,
   }
