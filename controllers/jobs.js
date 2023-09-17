@@ -89,8 +89,9 @@ const updateProfile = async (req, res) =>{
 
 
         if(req.file){
-            allowedKeys.profile_photo = '/assets/uploads/' + req.file.filename;
+            allowedKeys.profile_photo = 'assets/uploads/' + req.file.filename;
         }
+        console.log(userInfo.profile_photo);
         if(userInfo.profile_photo){
             const filePath = `${userInfo.profile_photo}`;
             fs.unlinkSync(filePath);
