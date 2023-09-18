@@ -5,7 +5,7 @@ const Router = express.Router();
 
 Router.route('/').get(getAllJobs).post(createJob);
 Router.route('/my-jobs').get(getMyJobs);
-Router.route('/update-profile').post(upload, updateProfile);
+Router.route('/update-profile').patch(upload, updateProfile);
 Router.route('/get-profile').get(getProfile);
 
 Router.route('/single-job/:id').get(getJob).patch(updateJob).delete(deleteJob)

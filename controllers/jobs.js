@@ -103,12 +103,12 @@ const updateProfile = async (req, res) =>{
             allowedKeys.profile_photo = 'assets/uploads/' + req.file.filename;
         }
         console.log(userInfo.profile_photo);
-        // if(userInfo.profile_photo){
-        //     const filePath = `${userInfo.profile_photo}`;
-        //     if(fs.existsSync(filePath)){
-        //         fs.unlinkSync(filePath);
-        //     }
-        // }
+        if(userInfo.profile_photo){
+            const filePath = `${userInfo.profile_photo}`;
+            if(fs.existsSync(filePath)){
+                fs.unlinkSync(filePath);
+            }
+        }
     
         allowedKeys.map(ele =>{
         if(data[ele]){
