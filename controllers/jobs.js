@@ -106,7 +106,7 @@ const updateProfile = async (req, res) =>{
 
 
         if(req.file){
-            allowedKeys.profile_photo = 'assets/uploads/' + req.file.filename;
+          cleanData.profile_photo = 'assets/avatar/' + req.file.filename;
         }
         
         if(userInfo.profile_photo && cleanData.profile_photo){
@@ -133,7 +133,7 @@ const updateProfile = async (req, res) =>{
   const upload = multer({
     storage: multer.diskStorage({
       destination: function(req, file, cb){
-        cb(null, 'assets/uploads')
+        cb(null, 'tmp')
       },
       filename: function(req ,file, cb){
         cb(null, file.fieldname+Date.now()+'.jpg')
