@@ -95,15 +95,15 @@ const updateProfile = async (req, res) =>{
 
     if(userInfo){
         const data = req.body;
-        const cleanData = {};
         const allowedKeys = ['name', 'email', 'password', 'profile_photo', 'address', 'company'];
+        const cleanData = {};
 
 
         if(req.file){
             allowedKeys.profile_photo = 'assets/uploads/' + req.file.filename;
         }
-        console.log(userInfo.profile_photo);
-        if(userInfo.profile_photo){
+        
+        if(userInfo.profile_photo && cleanData.profile_photo){
             const filePath = `${userInfo.profile_photo}`;
             if(fs.existsSync(filePath)){
                 fs.unlinkSync(filePath);
@@ -115,8 +115,8 @@ const updateProfile = async (req, res) =>{
             cleanData[ele] = data[ele]
         }})
     
-        let result = await user.findByIdAndUpdate({_id : req.user.userID}, {...allowedKeys}, {runValidators: true, new: true})
-        console.log(result);
+        let result = await user.findByIdAndUpdate({_id : req.user.userID}, {...cleanData}, {runValidators: true, new: true})
+        console.log(cleanData);
     
         return res.status(StatusCodes.OK).json({result});
     }
