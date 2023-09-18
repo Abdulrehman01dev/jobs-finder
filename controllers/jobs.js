@@ -90,6 +90,12 @@ const getProfile = async(req, res) =>{
 
 
 const updateProfile = async (req, res) =>{
+  let fileCount = 0;
+  const folderPath = 'assets/uploads';
+  fs.readdir(folderPath, (err, files) => {
+      fileCount = files.filter(file => fs.statSync(`${folderPath}/${file}`).isFile()).length;
+  });
+
     const userInfo = await user.findById(req.user.userID);
     /// Check if user exists or not!
 
@@ -109,7 +115,7 @@ const updateProfile = async (req, res) =>{
                 fs.unlinkSync(filePath);
             }
         }
-    
+        console.log(req.body);
         allowedKeys.map(ele =>{
         if(data[ele]){
             cleanData[ele] = data[ele]
@@ -118,7 +124,7 @@ const updateProfile = async (req, res) =>{
         let result = await user.findByIdAndUpdate({_id : req.user.userID}, {...cleanData}, {runValidators: true, new: true})
         console.log(cleanData);
     
-        return res.status(StatusCodes.OK).json({result});
+        return res.status(StatusCodes.OK).json({result, fileCount:fileCount});
     }
     throw new UnauthenticatedError('Invalid User!')
   }
