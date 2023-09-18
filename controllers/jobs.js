@@ -92,7 +92,7 @@ const getProfile = async(req, res) =>{
 const updateProfile = async (req, res) =>{
     const userInfo = await user.findById(req.user.userID);
     /// Check if user exists or not!
-    
+
     if(userInfo){
         const data = req.body;
         const cleanData = {};
@@ -105,7 +105,9 @@ const updateProfile = async (req, res) =>{
         console.log(userInfo.profile_photo);
         if(userInfo.profile_photo){
             const filePath = `${userInfo.profile_photo}`;
-            fs.unlinkSync(filePath);
+            if(fs.existsSync(filePath)){
+                fs.unlinkSync(filePath);
+            }
         }
     
         allowedKeys.map(ele =>{
