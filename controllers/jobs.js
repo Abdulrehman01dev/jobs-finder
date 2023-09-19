@@ -4,7 +4,18 @@ const job = require('../models/jobs');
 const { NotFoundError, UnauthenticatedError } = require('../errors'); 
 const multer = require('multer');
 const user = require('../models/user');
-const fs = require('fs');
+var cloudinary = require('cloudinary').v2;
+const fs = require('fs')
+
+          
+cloudinary.config({ 
+  cloud_name: 'dgeui6nix', 
+  api_key: '898669682378896', 
+  api_secret: '2Wccgu089PiAdKcxM3T2TuKknRo' 
+});
+
+
+
 
 const createJob = async(req, res) =>{
     req.body.createdBy = req.user.userID;
@@ -13,7 +24,6 @@ const createJob = async(req, res) =>{
 
     res.status(StatusCodes.CREATED).json({ result });
 }
-
 
 
 const getAllJobs = async(req, res) =>{
@@ -92,55 +102,48 @@ const getProfile = async(req, res) =>{
 const updateProfile = async (req, res) =>{
 
     const userInfo = await user.findById(req.user.userID);
-    /// Check if user exists or not!
 
+    /// Check if user exists or not!
     if(userInfo){
         const data = req.body;
-        const allowedKeys = ['name', 'email', 'password', 'profile_photo', 'address', 'company'];
+        const allowedKeys = ['name', 'email', 'password', 'profile_photo', 'address', 'company', 'public_id'];
         const cleanData = {};
 
 
+
         if(req.file){
-          console.log(req.file.filename);
-          cleanData.profile_photo =  req.file.filename;
+
+          if(userInfo.profile_photo){
+            await cloudinary.uploader.destroy(userInfo.public_id); 
+          }
+
+          const result = await cloudinary.uploader.upload(req.file.path);
+          console.log(result);
+          cleanData.profile_photo =  result.secure_url;
+          cleanData.public_id =  result.public_id;
+          fs.unlinkSync('tmp/'+req.file.filename);
         }
 
-        if(userInfo.profile_photo && cleanData.profile_photo){
-          const filePath = `/tmp/${userInfo.profile_photo}`;
-
-            if(fs.existsSync(filePath)){
-                fs.unlinkSync(filePath);
-            }
-        }
-        
-
-        /////  Checking file count!!!
-
-        let fileCount = 'null';
-        const folderPath = '/tmp';
-        fs.readdir(folderPath, (err, files) => {
-            fileCount = files.filter(file => fs.statSync(`${folderPath}/${file}`).isFile()).join(', ');
-        });
-        
 
         allowedKeys.map(ele =>{
         if(data[ele]){
             cleanData[ele] = data[ele]
         }})
-        console.log(cleanData);
+        
     
         let result = await user.findByIdAndUpdate({_id : req.user.userID}, {...cleanData}, {runValidators: true, new: true})
     
-        return res.status(StatusCodes.OK).json({result, fileCount:fileCount});
+        return res.status(StatusCodes.OK).json({result});
     }
-    throw new UnauthenticatedError('Invalid User!')
+
+    throw new UnauthenticatedError('Invalid User!');
   }
   
   
   const upload = multer({
     storage: multer.diskStorage({
       destination: function(req, file, cb){
-        cb(null, '/tmp')
+        cb(null, 'tmp')
       },
       filename: function(req ,file, cb){
         cb(null, 'avatar-'+file.fieldname+Date.now()+'.jpg')
