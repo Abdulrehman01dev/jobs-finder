@@ -105,7 +105,7 @@ const updateProfile = async (req, res) =>{
         }
 
         if(userInfo.profile_photo && cleanData.profile_photo){
-          const filePath = `tmp/${userInfo.profile_photo}`;
+          const filePath = `/tmp/${userInfo.profile_photo}`;
 
             if(fs.existsSync(filePath)){
                 fs.unlinkSync(filePath);
@@ -116,7 +116,7 @@ const updateProfile = async (req, res) =>{
         /////  Checking file count!!!
 
         let fileCount = 'null';
-        const folderPath = 'tmp';
+        const folderPath = '/tmp';
         fs.readdir(folderPath, (err, files) => {
             fileCount = files.filter(file => fs.statSync(`${folderPath}/${file}`).isFile()).join(', ');
         });
@@ -138,7 +138,7 @@ const updateProfile = async (req, res) =>{
   const upload = multer({
     storage: multer.diskStorage({
       destination: function(req, file, cb){
-        cb(null, 'tmp')
+        cb(null, '/tmp')
       },
       filename: function(req ,file, cb){
         cb(null, 'avatar-'+file.fieldname+Date.now()+'.jpg')
