@@ -18,7 +18,7 @@ const helmet = require('helmet');
 const cors = require('cors');
 const xss = require('xss-clean');
 
-/// Set limit on api for each user
+/// Set limit on api for each userss
 // app.set('trust proxy', 1)
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
