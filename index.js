@@ -12,7 +12,6 @@ const accountRouter = require('./routes/account');
 const jobsRouter = require('./routes/job');
 const connectDB = require('./db/connect');
 const authMiddleware = require('./middlewares/authentication');
-const cloudinary = require('cloudinary').v2;
 
 const { rateLimit } = require('express-rate-limit');
 const helmet = require('helmet');
@@ -20,7 +19,7 @@ const cors = require('cors');
 const xss = require('xss-clean');
 
 /// Set limit on api for each user
-app.set('trust proxy', 1)
+// app.set('trust proxy', 1)
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
 	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
@@ -32,8 +31,8 @@ app.use(express.json());
 app.use('/tmp', express.static('tmp'));
 
 app.use(helmet())
-app.use(limiter);
 app.use(cors({origin: '*', credentials:true,optionSuccessStatus:200}));
+app.use(limiter);
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     next(); // Important
