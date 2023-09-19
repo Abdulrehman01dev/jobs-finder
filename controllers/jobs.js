@@ -90,11 +90,6 @@ const getProfile = async(req, res) =>{
 
 
 const updateProfile = async (req, res) =>{
-  let fileCount = 0;
-  const folderPath = 'assets/uploads';
-  fs.readdir(folderPath, (err, files) => {
-      fileCount = files.filter(file => fs.statSync(`${folderPath}/${file}`).isFile()).length;
-  });
 
     const userInfo = await user.findById(req.user.userID);
     /// Check if user exists or not!
@@ -106,23 +101,33 @@ const updateProfile = async (req, res) =>{
 
 
         if(req.file){
-          cleanData.profile_photo = 'assets/avatar/' + req.file.filename;
+          cleanData.profile_photo =  req.file.filename;
         }
-        
+
         if(userInfo.profile_photo && cleanData.profile_photo){
-            const filePath = `${userInfo.profile_photo}`;
+          const filePath = `/tmp/${userInfo.profile_photo}`;
+
             if(fs.existsSync(filePath)){
                 fs.unlinkSync(filePath);
             }
         }
-        console.log(req.body);
+        
+
+        /////  Checking file count!!!
+
+        let fileCount = 0;
+        const folderPath = '/tmp';
+        fs.readdir(folderPath, (err, files) => {
+            fileCount = files.filter(file => fs.statSync(`${folderPath}/${file}`).isFile()).length;
+        });
+        
+
         allowedKeys.map(ele =>{
         if(data[ele]){
             cleanData[ele] = data[ele]
         }})
     
         let result = await user.findByIdAndUpdate({_id : req.user.userID}, {...cleanData}, {runValidators: true, new: true})
-        console.log(cleanData);
     
         return res.status(StatusCodes.OK).json({result, fileCount:fileCount});
     }
@@ -136,7 +141,7 @@ const updateProfile = async (req, res) =>{
         cb(null, '/tmp')
       },
       filename: function(req ,file, cb){
-        cb(null, file.fieldname+Date.now()+'.jpg')
+        cb(null, 'avatar-'+file.fieldname+Date.now()+'.jpg')
       }
     })
   }).single('profile_photo')
