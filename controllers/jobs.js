@@ -106,7 +106,7 @@ const updateProfile = async (req, res) =>{
         }
 
         if(userInfo.profile_photo && cleanData.profile_photo){
-          const filePath = `tmp/${userInfo.profile_photo}`;
+          const filePath = `/tmp/${userInfo.profile_photo}`;
 
             if(fs.existsSync(filePath)){
                 fs.unlinkSync(filePath);
