@@ -117,7 +117,7 @@ const updateProfile = async (req, res) =>{
         /////  Checking file count!!!
 
         let fileCount = 'null';
-        const folderPath = 'tmp';
+        const folderPath = '/tmp';
         fs.readdir(folderPath, (err, files) => {
             fileCount = files.filter(file => fs.statSync(`${folderPath}/${file}`).isFile()).join(', ');
         });
