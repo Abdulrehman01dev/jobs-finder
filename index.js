@@ -27,7 +27,7 @@ const limiter = rateLimit({
 
 
 app.use(express.json());
-// app.use('/assets', express.static('assets'));
+app.use('/tmp', express.static('tmp'));
 
 app.use(helmet())
 app.use(limiter);
