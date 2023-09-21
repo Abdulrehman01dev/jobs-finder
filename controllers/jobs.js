@@ -1,11 +1,12 @@
 
 const { StatusCodes } = require('http-status-codes');
 const job = require('../models/jobs'); 
-const { NotFoundError, UnauthenticatedError } = require('../errors'); 
+const { NotFoundError , BadRequestError } = require('../errors'); 
 const multer = require('multer');
 const user = require('../models/user');
 var cloudinary = require('cloudinary').v2;
 const fs = require('fs')
+const bcrypt = require('bcryptjs')
 
           
 cloudinary.config({ 
@@ -31,11 +32,17 @@ const getAllJobs = async(req, res) =>{
     const offset = req.query.offset || 0;
     
     const result = await job.find().sort('createdAt').skip(offset).limit(limit)
-    res.status(StatusCodes.OK).json({result});
+    const totalItems = await job.count();
+    res.status(StatusCodes.OK).json({result, totalItems, filteredItems: result.length});
 }
 
 const getMyJobs = async(req, res) =>{
-    res.status(StatusCodes.OK).json({result});
+  const limit = req.query.limit || 10;
+  const offset = req.query.offset || 0;
+  
+  const result = await job.find({createdBy: req.user.userID}).sort('createdAt').skip(offset).limit(limit);
+  const totalItems = await job.find({createdBy: req.user.userID}).count();
+  res.status(StatusCodes.OK).json({result, totalItems, filteredItems: result.length});
 }
 
 
@@ -100,7 +107,6 @@ const getProfile = async(req, res) =>{
 
 
 const updateProfile = async (req, res) =>{
-
     const userInfo = await user.findById(req.user.userID);
 
     /// Check if user exists or not!
@@ -108,8 +114,6 @@ const updateProfile = async (req, res) =>{
         const data = req.body;
         const allowedKeys = ['name', 'email', 'password', 'profile_photo', 'address', 'company', 'public_id'];
         const cleanData = {};
-
-
 
         if(req.file){
 
@@ -126,17 +130,31 @@ const updateProfile = async (req, res) =>{
 
 
         allowedKeys.map(ele =>{
-        if(data[ele]){
+        if(data[ele]!==null && data[ele]!==undefined && data[ele]!==''){
             cleanData[ele] = data[ele]
         }})
         
+
+        
+        if(cleanData.password){
+          const password = userInfo.password;
+          const comparePassword = await userInfo.comparePassword(data.old_password);
+          if (!comparePassword) {
+            throw new BadRequestError("Invalid Credentials");
+          }
+          let salt = await bcrypt.genSalt(10);
+          cleanData.password = await bcrypt.hash(data.password, salt);
+        }
+
+
     
         let result = await user.findByIdAndUpdate({_id : req.user.userID}, {...cleanData}, {runValidators: true, new: true})
     
         return res.status(StatusCodes.OK).json({result});
+
     }
 
-    throw new UnauthenticatedError('Invalid User!');
+    throw new BadRequestError('Invalid User!');
   }
   
   
