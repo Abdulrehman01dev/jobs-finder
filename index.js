@@ -19,7 +19,7 @@ const cors = require('cors');
 const xss = require('xss-clean');
 
 /// Set limit on api for each userss
-// app.set('trust proxy', 1)
+app.set('trust proxy', true)
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
 	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
