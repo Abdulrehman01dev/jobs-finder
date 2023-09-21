@@ -125,7 +125,9 @@ const updateProfile = async (req, res) =>{
           console.log(result);
           cleanData.profile_photo =  result.secure_url;
           cleanData.public_id =  result.public_id;
-          fs.unlinkSync('tmp/'+req.file.filename);
+          if(fs.existsSync('tmp/'+req.file.filename)){
+            fs.unlinkSync('tmp/'+req.file.filename);
+          }
         }
 
 
