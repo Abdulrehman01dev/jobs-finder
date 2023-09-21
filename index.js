@@ -13,18 +13,18 @@ const jobsRouter = require('./routes/job');
 const connectDB = require('./db/connect');
 const authMiddleware = require('./middlewares/authentication');
 
-const { rateLimit } = require('express-rate-limit');
+// const { rateLimit } = require('express-rate-limit');
 const helmet = require('helmet');
 const cors = require('cors');
 const xss = require('xss-clean');
 
 /// Set limit on api for each userss
-app.set('trust proxy', false)
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-    validate: {xForwardedForHeader: false}
-})
+// app.set('trust proxy', false)
+// const limiter = rateLimit({
+//     windowMs: 15 * 60 * 1000, // 15 minutes
+// 	max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+//     validate: {xForwardedForHeader: false}
+// })
 
 
 
@@ -33,7 +33,7 @@ app.use('/tmp', express.static('tmp'));
 
 app.use(helmet())
 app.use(cors({origin: '*', credentials:true,optionSuccessStatus:200}));
-app.use(limiter);
+// app.use(limiter);
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     next(); // Important
