@@ -27,20 +27,48 @@ const createJob = async(req, res) =>{
 }
 
 
+
 const getAllJobs = async(req, res) =>{
-    const limit = req.query.limit || 10;
-    const offset = req.query.offset || 0;
-    
-    const result = await job.find().sort('createdAt').skip(offset).limit(limit)
-    const totalItems = await job.count();
-    res.status(StatusCodes.OK).json({result, totalItems, filteredItems: result.length});
+
+  const  { limit = 10, offset = 0, searchColumn, searchString, sort } = req.query;
+
+  const queryData= {};
+
+  if(searchColumn && searchString){
+
+    if(searchColumn==='salery'){
+      queryData.priceRange =  { $gte: searchString, $lte: searchString }
+      console.log(queryData);
+    }
+    else{
+      queryData[searchColumn] = {$regex: searchString, $options:'i'};
+    }
+  }
+
+  let result =  job.find(queryData).skip(parseInt(offset)).limit(parseInt(limit));
+
+  if(sort){
+    let sortdata = sort.split('_')
+    let data = sortdata[1] === 'asyn' ? sortdata[0] : `-${sortdata[0]}`
+    result.sort(data)
+  }
+  else{
+    result.sort('-createdAt')
+  }
+
+  const jobList = await result
+  // const filteredItems = await job.countDocuments(queryData);
+  const totalItems = await job.countDocuments(queryData);
+  res.status(StatusCodes.OK).json({result:jobList, totalItems});
 }
+
+
 
 const getMyJobs = async(req, res) =>{
   const limit = req.query.limit || 10;
   const offset = req.query.offset || 0;
   
-  const result = await job.find({createdBy: req.user.userID}).sort('createdAt').skip(offset).limit(limit);
+  const result = await job.find({createdBy: req.user.userID}).sort('-createdAt').skip(offset).limit(limit);
   const totalItems = await job.find({createdBy: req.user.userID}).count();
   res.status(StatusCodes.OK).json({result, totalItems, filteredItems: result.length});
 }
