@@ -10,11 +10,10 @@ const bcrypt = require('bcryptjs')
 
           
 cloudinary.config({ 
-  cloud_name: 'dgeui6nix', 
-  api_key: '898669682378896', 
-  api_secret: '2Wccgu089PiAdKcxM3T2TuKknRo' 
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key:  process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
-
 
 
 
