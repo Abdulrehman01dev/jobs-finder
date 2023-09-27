@@ -63,46 +63,48 @@ if(userInfo){
   const token =  jwt.sign({email: userInfo.email, _id: userInfo._id}, secret, {expiresIn:'10m'})
   
   const siteUrl = process.env.siteUrl
-  const link = `${siteUrl}/account/reset-password/${userInfo._id}/${token}`
+  const link = `${siteUrl}/account/reset-password/${userInfo._id}/${token}`;
+  
+  
   const html = `
   <h1 style="color:#2FCA76;">Jobs Finder</h1>
-    <h2 style="background:#2FCA76; color:#fff; padding:10px;">Reset your Jobs Finder password</h2>
+  <h2 style="background:#2FCA76; color:#fff; padding:10px;">Reset your Jobs Finder password</h2>
   <div style="border: 1px solid #2FCA76; text-align:center; color:#000 !important;">
-   <p>Jobs Finder password reset </p>
-   <p>We heard that you lost your Jobs Finder password. Sorry about that! </p>
-   <p>But don’t worry! You can use the following button to reset your password:</p>
-    <a href="${link}" style="background:#2FCA76; color:#fff; padding:10px;margin: 10px;display: inline-block;">Reset your password</a>
-    <p>If you don’t use this link within 10 minutes, it will expire. To get a new password reset link, visit: <a href="http://localhost:4200/account/forgot-password">${siteUrl}/account/forgot-password</a></p>
+    <p>Jobs Finder password reset</p>
+    <p>We heard that you lost your Jobs Finder password. Sorry about that!</p>
+    <p>But don’t worry! You can use the following button to reset your password:</p>
+    <a href=${link} style="background:#2fca76;color:#fff;padding:10px;margin:10px;display:inline-block">Reset your password</a>
+    <p>If you don’t use this link within 10 minutes, it will expire. To get a new password reset link, visit: <a href="${siteUrl}/account/forgot-password">${siteUrl}/account/forgot-password</a></p>
     <p>Thanks,</p>
-    <p>The Jobs Finder Team</p></div>
+    <p>The Jobs Finder Team</p>
+  </div>
   `
-  var transporter = nodemailer.createTransport({
+
+  let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: process.env.COMPANY_EMAIL,
       pass: process.env.EMAIL_PASS
     }
   });
+
   
-  var mailOptions = {
-    from: 'hunaindev1@gmail.com',
-    to: email,
-    subject: '<jobs Finder> Reset your password!',
-    html: html
-  };
-  
-  transporter.sendMail(mailOptions, function(error, info){
-    if (error) {
+  try {
+    await transporter.sendMail({
+      from: process.env.COMPANY_EMAIL,
+      to: email,
+      subject: "<jobs Finder> Reset your password!",
+      html: html,
+    });
+    res.json({ status: "Ok" });
+    } catch (error) {
       console.log(error);
-    } else {
-      console.log('Email sent: ' + info.response);
-    }
-  });
+      throw new BadRequestError("Internal Server error! Please try again later");
+  }
 
 }else{
   throw new BadRequestError('Invalid User Email!')
 }
-  res.json({status: 'Ok'})
 }
 
 
