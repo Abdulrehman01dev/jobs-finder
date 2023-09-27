@@ -64,7 +64,7 @@ if(userInfo){
   
   const siteUrl = process.env.siteUrl
   const link = `${siteUrl}/account/reset-password/${userInfo._id}/${token}`;
-  
+  const subject = "<jobs Finder> Reset your password!"
   
   const html = `
   <h1 style="color:#2FCA76;">Jobs Finder</h1>
@@ -79,24 +79,10 @@ if(userInfo){
     <p>The Jobs Finder Team</p>
   </div>
   `
-
-  let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.COMPANY_EMAIL,
-      pass: process.env.EMAIL_PASS
-    }
-  });
-
   
   try {
-    await transporter.sendMail({
-      from: process.env.COMPANY_EMAIL,
-      to: email,
-      subject: "<jobs Finder> Reset your password!",
-      html: html,
-    });
-    res.json({ status: "Ok" });
+    await sendEmail(email, subject, html);
+    res.json({ respones: "Forgot Password Email Sent" });
     } catch (error) {
       console.log(error);
       throw new BadRequestError("Internal Server error! Please try again later");
@@ -176,6 +162,25 @@ const expirationTime = () =>{
   return expirationTime;
 }
 
+
+const sendEmail = async(email, subject, html) =>{
+
+  let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.COMPANY_EMAIL,
+      pass: process.env.EMAIL_PASS
+    }
+  });
+
+ return await transporter.sendMail({
+    from: process.env.COMPANY_EMAIL,
+    to: email,
+    subject: subject,
+    html: html,
+  });
+
+}
 
 
 module.exports = {
